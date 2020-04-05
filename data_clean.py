@@ -5,7 +5,7 @@ import re
 
 
 
-infile = open('./en_us/data/set1-en_us.json',encoding='utf8') #reading in JSON file
+infile = open('./data/set1-en_us.json',encoding='utf8') #reading in JSON file
 data = json.load(infile)
 
 #Below is a list of card values I extracted for each card from the respective key in JSON file
@@ -128,19 +128,24 @@ clean_type = clean_series2(df['type'])
 
 
 #joining all of the cleaned dataframes together and doing an additional cleaning of some column names
-clean_df = pd.DataFrame(data=[clean_name,clean_region,clean_type])
+clean_df = pd.DataFrame(data=[clean_name,clean_region,clean_type,df['cost'],df['attack'],df['health']])
 clean_df = clean_df.T
-clean_df = clean_df.rename(mapper={'name':'card_name','type':'card_type','region':'card_region'},axis=1) #renaming column labels to avoid overlap when joining dataframes
+clean_df = clean_df.rename(mapper={'name':'card_name','type':'card_type','region':'card_region',
+                                   'cost':'card_cost','attack':'card_attack','health':'card_health'},axis=1) #renaming column labels to avoid overlap when joining dataframes
 clean_df = clean_df.join(descript_count)
 clean_df = clean_df.join(keyword_count)
-clean_df.columns = map(str.lower,clean_df.columns)
+clean_df = clean_df.rename(mapper={'Barrier':'barrier_kw', 'Burst':'burst_kw', "Can't Block":'cannot_block', 'Ephemeral':'ephemeral_kw','Last Breath':'last_breath_kw', 
+                                   'Challenger':'challenger_kw','Elusive':'elusive_kw','Regeneration':'regeneration_kw','Double Attack':'double_attack_kw',
+                                   'Imbue':'imbue_kw', 'Tough':'tough_kw','Lifesteal':'lifesteal_kw','Fast':'fast_kw','Fearsome':'fearsome_kw','Overwhelm':'overwhelm_kw',
+                                   'Quick Attack':'quick_attack_kw','Skill':'skill_kw','Slow':'slow_kw','Fleeting':'fleeting_kw','Trap':'trap_kw'}, axis=1) #had to come back and edit some names to avoid duplicate column names from description/keyword conflict
+clean_df.columns = map(str.lower,clean_df.columns) 
 clean_df = clean_df.rename(mapper={'+0|+2':'plus_zero_plus_two','+0|+3':'plus_zero_plus_three','+1|+0':'plus_one_plus_zero',
                                    '+1|+1':'plus_one_plus_one','+2|+0':'plus_two_plus_zero','+2|+2':'plus_two_plus_two','+3|+0':'plus_three_plus_zero',
                                    '+3|+3':'plus_three_plus_three','+4|+0':'plus_four_plus_zero','+4|+4':'plus_four_plus_four','+8|+4':'plus_eight_plus_four',
-                                   '-1|-0':'minus_one_minus_zero','0':'zero','1':'one','10':'ten','12+':'twelve_plus','15':'fifteen','15+':'fifteen_plus',
-                                   '1|1':'one_one','2':'two','20':'twenty','2|5':'two_five','3':'three','3+':'three_plus','4':'four','4+':'four_plus', 
+                                   '-1|-0':'minus_one_minus_zero','0':'zero','1':'one_descript','10':'ten','12+':'twelve_plus','15':'fifteen','15+':'fifteen_plus',
+                                   '1|1':'one_one','2':'two_descript','20':'twenty','2|5':'two_five','3':'three','3+':'three_plus','4':'four','4+':'four_plus', 
                                    '5':'five','5+':'five_plus','5|2':'five_two','6':'six','6+':'six_plus','7':'seven','7+':'seven_plus','8+':'eight_plus',
                                    "can't block":'cannot_block','last breath':'last_breath','double attack':'double_attack','quick attack':'quick_attack'}, axis=1)
 
-#finally serializing dataset into a pickle file
+# #finally serializing dataset into a pickle file
 clean_df.to_pickle('lor.pkl')
