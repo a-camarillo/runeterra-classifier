@@ -231,4 +231,4 @@ noxus_counts_clean = drop_labels(noxus_counts)
 # fig.savefig('./images/attack_health_dist_by_region')
 
 first_round = df.drop(columns=['when','in','to','the','and'])
-first_round.to_csv('first_round')
+first_round.to_csv('first_round.csv')
